@@ -1,0 +1,5 @@
+mlflow==1.29.0
+pandas==1.4.3
+scikit-learn==1.1.2
+numpy==1.23.2
+hyperopt==0.2.7
