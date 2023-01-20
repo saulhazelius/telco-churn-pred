@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API churn prediction
+
+Globals:
+  Function:
+    Timeout: 50
+    MemorySize: 3000
+
+Resources:
+  ChurnPredApi:
+    Type: AWS::Serverless::Api
+    Properties:
+     StageName: Dev
+  ChurnPredFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: Churn-Pred
+      PackageType: Image
+      Architectures:
+        - x86_64
+      Events:
+        calculate:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref ChurnPredApi
+            Path: /churn-classification
+            Method: post
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./app
+      DockerTag: !Ref DockerTag
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ChurnPredFunction:
+    Description: "ChurnPred Lambda Function ARN"
+    Value: !GetAtt ChurnPredFunction.Arn
+  ChurnPredFunctionIamRole:
+    Description: "Implicit IAM Role created for ChurnPred function"
+    Value: !GetAtt ChurnPredFunctionRole.Arn
